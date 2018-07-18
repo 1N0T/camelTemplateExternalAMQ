@@ -21,4 +21,4 @@ Para empaquetar y ejecutar, podemos optar por alguna de las siguientes opciones:
 mvn package && java -jar ./target/plantillaCamel.jar "localhost 61616 miCola"
 mvn package && java -cp ./target/plantillaCamel.jar ToniS.ProcesoCamel "localhost 61616 miCola"
 ```
-> **OJO !!!** no confundir el puerto de la consola de administración de **ActiveMQ** (normalmente 81616), con el puerto al que tienen que enviar los mensajes a la cola (61616 por defecto)
+> **OJO !!!** no confundir el puerto de la consola de administración de **ActiveMQ** (normalmente 8161), con el puerto al que tienen que enviar los mensajes a la cola (61616 por defecto)
