@@ -1,0 +1,136 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+	http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>es.1N0T</groupId>
+	<artifactId>camel-plantilla</artifactId>
+	<version>1.0</version>
+	<packaging>jar</packaging>
+	<name>Plantilla mínima de camel</name>
+	
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.camel</groupId>
+			<artifactId>camel-core</artifactId>
+			<version>${camel.version}</version>
+		</dependency>  
+
+		<!-- Dependencias para el conversion a JSON -->
+		<dependency>
+			<groupId>org.apache.camel</groupId>
+			<artifactId>camel-xstream</artifactId>
+			<version>${camel.version}</version>
+		</dependency>  
+		<dependency>
+			<groupId>org.apache.camel</groupId>
+			<artifactId>camel-jackson</artifactId>
+			<version>${camel.version}</version>
+		</dependency>  
+
+		<!-- Dependencias para el componente ActiveMQ -->
+		<dependency>
+			<groupId>org.apache.activemq</groupId>
+			<artifactId>activemq-camel</artifactId>
+			<version>${AMQ.version}</version>
+		</dependency>
+
+		<!-- Dependencias para el componente log de camel -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>${slf4j.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>${slf4j.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>${log4j.version}</version>
+		</dependency>
+
+	</dependencies>
+
+	<properties>
+		<AMQ.version>5.15.4</AMQ.version>
+		<camel.version>2.22.0</camel.version>
+		<slf4j.version>1.7.5</slf4j.version>
+		<log4j.version>1.2.17</log4j.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
+
+	<build>
+		<finalName>plantillaCamel</finalName>
+		<plugins>
+			<!--
+			========================================================================================================================
+			Pluguins para compilación empaquetado y pruebas
+		   	mvn clean	(para borrar compilaciones anteriores)
+		   	mvn compile 	(para compilar)
+		   	mvn package 	(para generar el jar -el plugin shade incluye todas las dependencias-)
+		   	mvn install 	(para generar el jar y añadirlo al repositorio m2)
+			mvn compile exec:java -Dexec.mainClass=ToniS.ProcesoCamel -Dexec.args="mi_argumento"
+			
+			Para ejecutar una vez empaquetado, se puede optar por alguna de las siguientes opciones:
+			java -jar ./target/plantillaCamel.jar "localhost 61616 miCola"
+			java -cp ./target/plantillaCamel.jar ToniS.ProcesoCamel "localhost 61616 miCola"
+			
+			========================================================================================================================
+			-->
+			<plugin>
+				<!--
+				========================================================================
+				Este plugin genera un jar incluyendo las dependencias en la fase package
+				========================================================================
+				-->
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>2.4.2</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<!--
+							=========================================================================================
+							Ha sido necesario incluir el filtro siguiente para evitar el siguiente error de ejecución
+						    Exception in thread "main" java.lang.SecurityException: 
+						    Invalid signature file digest for Manifest main attributes
+							=========================================================================================
+							-->
+							<filters>
+								<filter>
+								    <artifact>*:*</artifact>
+								    <excludes>
+								        <exclude>META-INF/*.SF</exclude>
+								        <exclude>META-INF/*.DSA</exclude>
+								        <exclude>META-INF/*.RSA</exclude>
+								    </excludes>
+								</filter>
+							</filters>
+
+							<source>1.8</source>
+					      <target>1.8</target>
+							<transformers>
+								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+									<manifestEntries>
+										<Main-Class>ToniS.ProcesoCamel</Main-Class>
+										<Build-Number>1.0</Build-Number>
+									</manifestEntries>
+								</transformer>
+							</transformers>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+		</plugins>
+	</build>
+</project>
